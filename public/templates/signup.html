@@ -2,16 +2,16 @@
 <hr>
 <form ng-submit="auth.signup()">
 	<div class="form-group">
-	  <input type="text" ng-model="auth.user.displayName" class="form-control" placeholder="Full Name">
+	  <input type="text" ng-model="auth.new_user.displayName" class="form-control" placeholder="Full Name">
 	</div>
   <div class="form-group">
-    <input type="text" ng-model="auth.user.username" class="form-control" placeholder="Username">
+    <input type="text" ng-model="auth.new_user.username" class="form-control" placeholder="Username">
   </div>
   <div class="form-group">
-    <input type="text" ng-model="auth.user.email" class="form-control" placeholder="Email">
+    <input type="text" ng-model="auth.new_user.email" class="form-control" placeholder="Email">
   </div>
   <div class="form-group">
-    <input type="password" ng-model="auth.user.password" class="form-control" placeholder="Password">
+    <input type="password" ng-model="auth.new_user.password" class="form-control" placeholder="Password">
   </div>
   <input type="submit" value="Sign Up" class="btn btn-block btn-info">
 </form>

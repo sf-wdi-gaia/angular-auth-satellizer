@@ -109,18 +109,18 @@ function AuthController ($auth, $location) {
   }
 
   // clear sign up / login forms
-  vm.user = {};
+  vm.new_user = {};
 
   vm.signup = function() {
     // signup (https://github.com/sahat/satellizer#authsignupuser-options)
-    $auth.signup(vm.user)
+    $auth.signup(vm.new_user)
       .then(function (response) {
         // set token (https://github.com/sahat/satellizer#authsettokentoken)
         $auth.setToken(response.data.token);
         // call vm.isAuthenticated to set vm.currentUser
         vm.isAuthenticated();
         // clear sign up form
-        vm.user = {};
+        vm.new_user = {};
         // redirect to '/profile'
         $location.path('/profile');
       }, function (error) {
@@ -130,14 +130,14 @@ function AuthController ($auth, $location) {
 
   vm.login = function() {
     // login (https://github.com/sahat/satellizer#authloginuser-options)
-    $auth.login(vm.user)
+    $auth.login(vm.new_user)
       .then(function (response) {
         // set token (https://github.com/sahat/satellizer#authsettokentoken)
         $auth.setToken(response.data.token);
         // call vm.isAuthenticated to set vm.currentUser
         vm.isAuthenticated();
         // clear sign up form
-        vm.user = {};
+        vm.new_user = {};
         // redirect to '/profile'
         $location.path('/profile');
       }, function (error) {
