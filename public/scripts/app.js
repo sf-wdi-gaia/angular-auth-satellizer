@@ -11,6 +11,10 @@ angular
   .config(config)
 
 
+////////////
+// ROUTES //
+////////////
+
 config.$inject = ["$routeProvider", "$locationProvider"] // minification protection
 function config($routeProvider, $locationProvider) {
   $routeProvider
@@ -43,6 +47,10 @@ function config($routeProvider, $locationProvider) {
     requireBase: false
   });
 }
+
+/////////////////
+// CONTROLLERS //
+/////////////////
 
 MainController.$inject = ["$auth", "$http", "$location"] // minification protection
 function MainController ($auth, $http, $location) {
@@ -164,6 +172,10 @@ function ProfileController ($auth, $http, $location) {
       });
   };
 }
+
+////////////////////
+// Custom Filters //
+////////////////////
 
 function formatDate() {
   return function (date) {
