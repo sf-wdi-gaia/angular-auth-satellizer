@@ -11,24 +11,28 @@ angular
   .config(config)
 
 
-config.$inject = ["$routeProvider", "$locationProvider"]) // minification protection
+config.$inject = ["$routeProvider", "$locationProvider"] // minification protection
 function config($routeProvider, $locationProvider) {
   $routeProvider
     .when('/', {
       templateUrl: 'templates/home.html',
-      controller: 'HomeController'
+      controller: 'HomeController',
+      controllerAs: 'home'
     })
     .when('/signup', {
       templateUrl: 'templates/signup.html',
-      controller: 'AuthController'
+      controller: 'AuthController',
+      controllerAs: 'auth'
     })
     .when('/login', {
       templateUrl: 'templates/login.html',
-      controller: 'AuthController'
+      controller: 'AuthController',
+      controllerAs: 'auth'
     })
     .when('/profile', {
       templateUrl: 'templates/profile.html',
-      controller: 'ProfileController'
+      controller: 'ProfileController',
+      controllerAs: 'profile'
     })
     .otherwise({
       redirectTo: '/'
@@ -40,15 +44,17 @@ function config($routeProvider, $locationProvider) {
   });
 }
 
-MainController.$inject = ["$scope", "$auth", "$http", "$location"]) // minification protection
-function MainController ($scope, $auth, $http, $location) {
-  $scope.isAuthenticated = function() {
+MainController.$inject = ["$auth", "$http", "$location"] // minification protection
+function MainController ($auth, $http, $location) {
+  var vm = this;
+
+  vm.isAuthenticated = function() {
     // send GET request to '/api/me'
     $http.get('/api/me')
       .then(function (response) {
-        // if response.data comes back, set $scope.currentUser = response.data
+        // if response.data comes back, set vm.currentUser = response.data
         if (response.data) {
-          $scope.currentUser = response.data;
+          vm.currentUser = response.data;
         } else {
           // otherwise remove token (https://github.com/sahat/satellizer#authremovetoken)
           $auth.removeToken();
@@ -59,59 +65,62 @@ function MainController ($scope, $auth, $http, $location) {
       });
   };
 
-  $scope.isAuthenticated();
+  vm.isAuthenticated();
 
-  $scope.logout = function() {
+  vm.logout = function() {
     // logout (https://github.com/sahat/satellizer#authlogout)
     $auth.logout()
       .then(function() {
-        // set $scope.currentUser = null
-        $scope.currentUser = null;
+        // set vm.currentUser = null
+        vm.currentUser = null;
         // redirect to '/login'
         $location.path('/login');
       });
   };
 }
 
-HomeController.$inject = ["$scope", "$http"]) // minification protection
-function HomeController ($scope, $http) {
-  $scope.posts = [];
-  $scope.post = {};
+HomeController.$inject = ["$http"] // minification protection
+function HomeController ($http) {
+  var vm = this;
+  vm.posts = [];
+  vm.new_post = {};
 
   $http.get('/api/posts')
     .then(function (response) {
-      $scope.posts = response.data;
+      vm.posts = response.data;
     });
 
-  $scope.createPost = function() {
-    $http.post('/api/posts', $scope.post)
+  vm.createPost = function() {
+    $http.post('/api/posts', vm.new_post)
       .then(function (response) {
-        $scope.post = {};
-        $scope.posts.push(response.data);
+        vm.new_post = {};
+        vm.posts.push(response.data);
       });
   };
 }
 
-AuthController.$inject = ["$scope", "$auth", "$location"]) // minification protection
-function AuthController ($scope, $auth, $location) {
-  // if $scope.currentUser, redirect to '/profile'
-  if ($scope.currentUser) {
+AuthController.$inject = ["$auth", "$location"] // minification protection
+function AuthController ($auth, $location) {
+  var vm = this;
+
+  // if vm.currentUser, redirect to '/profile'
+  if (vm.currentUser) {
     $location.path('/profile');
   }
 
   // clear sign up / login forms
-  $scope.user = {};
+  vm.user = {};
 
-  $scope.signup = function() {
+  vm.signup = function() {
     // signup (https://github.com/sahat/satellizer#authsignupuser-options)
-    $auth.signup($scope.user)
+    $auth.signup(vm.user)
       .then(function (response) {
         // set token (https://github.com/sahat/satellizer#authsettokentoken)
         $auth.setToken(response.data.token);
-        // call $scope.isAuthenticated to set $scope.currentUser
-        $scope.isAuthenticated();
+        // call vm.isAuthenticated to set vm.currentUser
+        vm.isAuthenticated();
         // clear sign up form
-        $scope.user = {};
+        vm.user = {};
         // redirect to '/profile'
         $location.path('/profile');
       }, function (error) {
@@ -119,16 +128,16 @@ function AuthController ($scope, $auth, $location) {
       });
   };
 
-  $scope.login = function() {
+  vm.login = function() {
     // login (https://github.com/sahat/satellizer#authloginuser-options)
-    $auth.login($scope.user)
+    $auth.login(vm.user)
       .then(function (response) {
         // set token (https://github.com/sahat/satellizer#authsettokentoken)
         $auth.setToken(response.data.token);
-        // call $scope.isAuthenticated to set $scope.currentUser
-        $scope.isAuthenticated();
+        // call vm.isAuthenticated to set vm.currentUser
+        vm.isAuthenticated();
         // clear sign up form
-        $scope.user = {};
+        vm.user = {};
         // redirect to '/profile'
         $location.path('/profile');
       }, function (error) {
@@ -137,17 +146,18 @@ function AuthController ($scope, $auth, $location) {
   };
 }
 
-ProfileController.$inject = ["$scope", "$auth", "$http", "$location"]; // minification protection
-function ProfileController ($scope, $auth, $http, $location) {
+ProfileController.$inject = ["$auth", "$http", "$location"] // minification protection
+function ProfileController ($auth, $http, $location) {
+  var vm = this;
   // if user is not logged in, redirect to '/login'
-  if ($scope.currentUser === undefined) {
+  if (vm.currentUser === undefined) {
     $location.path('/login');
   }
 
-  $scope.editProfile = function() {
-    $http.put('/api/me', $scope.currentUser)
+  vm.editProfile = function() {
+    $http.put('/api/me', vm.currentUser)
       .then(function (response) {
-        $scope.showEditForm = false;
+        vm.showEditForm = false;
       }, function (error) {
         console.error(error);
         $auth.removeToken();

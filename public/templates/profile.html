@@ -1,23 +1,23 @@
-<h3>{{currentUser.displayName}}</h3>
+<h3>{{main.currentUser.displayName}}</h3>
 <hr>
-<p><strong>Email:</strong> {{currentUser.email}}</p>
-<p><strong>Username:</strong> {{currentUser.username}}</p>
-<p><strong>Joined:</strong> {{currentUser.created | date:'MMMM dd, yyyy'}}</p>
-<p><strong>Posts:</strong> {{currentUser.posts.length}}</p>
+<p><strong>Email:</strong> {{main.currentUser.email}}</p>
+<p><strong>Username:</strong> {{main.currentUser.username}}</p>
+<p><strong>Joined:</strong> {{main.currentUser.created | date:'MMMM dd, yyyy'}}</p>
+<p><strong>Posts:</strong> {{main.currentUser.posts.length}}</p>
 
 <hr>
-<a href="#" ng-click="showEditForm=true" ng-hide="showEditForm" class="btn btn-default"><i class="fa fa-pencil"></i> Edit Profile</a>
+<a href="#" ng-click="profile.showEditForm=true" ng-hide="profile.showEditForm" class="btn btn-default"><i class="fa fa-pencil"></i> Edit Profile</a>
 
-<form ng-show="showEditForm" ng-submit="editProfile()">
+<form ng-show="profile.showEditForm" ng-submit="profile.editProfile()">
 	<div class="form-group">
-	  <input type="text" ng-model="currentUser.displayName" class="form-control" placeholder="Full Name">
+	  <input type="text" ng-model="main.currentUser.displayName" class="form-control" placeholder="Full Name">
 	</div>
   <div class="form-group">
-    <input type="text" ng-model="currentUser.username" class="form-control" placeholder="Username">
+    <input type="text" ng-model="main.currentUser.username" class="form-control" placeholder="Username">
   </div>
   <div class="form-group">
-    <input type="text" ng-model="currentUser.email" class="form-control" placeholder="Email">
+    <input type="text" ng-model="main.currentUser.email" class="form-control" placeholder="Email">
   </div>
   <input type="submit" value="Edit Profile" class="btn btn-info">&nbsp;
-  <button ng-click="showEditForm=false" class="btn btn-default">Cancel</button>
+  <button ng-click="profile.showEditForm=false" class="btn btn-default">Cancel</button>
 </form>
