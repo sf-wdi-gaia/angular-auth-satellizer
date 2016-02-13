@@ -1,5 +1,5 @@
 angular
-  .module('authSampleApp', [
+  .module('AuthSampleApp', [
     'ngRoute',
     'satellizer'
   ])
