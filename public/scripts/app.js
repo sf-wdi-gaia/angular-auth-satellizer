@@ -1,6 +1,6 @@
 angular
   .module('AuthSampleApp', [
-    'ngRoute',
+    'ui.router',
     'satellizer'
   ])
   .controller('MainController', MainController)
@@ -8,51 +8,59 @@ angular
   .controller('AuthController', AuthController)
   .controller('ProfileController', ProfileController)
   .filter('formatDate', formatDate)
-  .config(config)
+  .config(configRoutes)
+  ;
 
 
 ////////////
 // ROUTES //
 ////////////
 
-config.$inject = ["$routeProvider", "$locationProvider"] // minification protection
-function config($routeProvider, $locationProvider) {
-  $routeProvider
-    .when('/', {
-      templateUrl: 'templates/home.html',
-      controller: 'HomeController',
-      controllerAs: 'home'
-    })
-    .when('/signup', {
-      templateUrl: 'templates/signup.html',
-      controller: 'AuthController',
-      controllerAs: 'auth'
-    })
-    .when('/login', {
-      templateUrl: 'templates/login.html',
-      controller: 'AuthController',
-      controllerAs: 'auth'
-    })
-    .when('/profile', {
-      templateUrl: 'templates/profile.html',
-      controller: 'ProfileController',
-      controllerAs: 'profile'
-    })
-    .otherwise({
-      redirectTo: '/'
-    });
+configRoutes.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"]; // minification protection
+function configRoutes($stateProvider, $urlRouterProvider, $locationProvider) {
 
+  //this allows us to use routes without hash params!
   $locationProvider.html5Mode({
     enabled: true,
     requireBase: false
   });
+
+  // for any unmatched URL redirect to /
+  $urlRouterProvider.otherwise("/");
+
+  $stateProvider
+    .state('home', {
+      url: '/',
+      templateUrl: 'templates/home.html',
+      controller: 'HomeController',
+      controllerAs: 'home'
+    })
+    .state('signup', {
+      url: '/signup',
+      templateUrl: 'templates/signup.html',
+      controller: 'AuthController',
+      controllerAs: 'auth'
+    })
+    .state('login', {
+      url: '/login',
+      templateUrl: 'templates/login.html',
+      controller: 'AuthController',
+      controllerAs: 'auth'
+    })
+    .state('profile', {
+      url: '/profile',
+      templateUrl: 'templates/profile.html',
+      controller: 'ProfileController',
+      controllerAs: 'profile'
+    })
+
 }
 
 /////////////////
 // CONTROLLERS //
 /////////////////
 
-MainController.$inject = ["$auth", "$http", "$location"] // minification protection
+MainController.$inject = ["$auth", "$http", "$location"]; // minification protection
 function MainController ($auth, $http, $location) {
   var vm = this;
 
@@ -87,7 +95,7 @@ function MainController ($auth, $http, $location) {
   };
 }
 
-HomeController.$inject = ["$http"] // minification protection
+HomeController.$inject = ["$http"]; // minification protection
 function HomeController ($http) {
   var vm = this;
   vm.posts = [];
@@ -107,7 +115,7 @@ function HomeController ($http) {
   };
 }
 
-AuthController.$inject = ["$auth", "$location"] // minification protection
+AuthController.$inject = ["$auth", "$location"]; // minification protection
 function AuthController ($auth, $location) {
   var vm = this;
 
@@ -154,7 +162,7 @@ function AuthController ($auth, $location) {
   };
 }
 
-ProfileController.$inject = ["$auth", "$http", "$location"] // minification protection
+ProfileController.$inject = ["$auth", "$http", "$location"]; // minification protection
 function ProfileController ($auth, $http, $location) {
   var vm = this;
   // if user is not logged in, redirect to '/login'

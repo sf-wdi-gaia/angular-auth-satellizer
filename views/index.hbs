@@ -21,10 +21,10 @@
   <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
   <!-- angular -->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0/angular.js"></script>
 
-  <!-- ngRoute -->
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.min.js"></script>
+  <!-- ui router -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.18/angular-ui-router.min.js"></script>
 
   <!-- satellizer -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/satellizer/0.13.4/satellizer.min.js"></script>
@@ -51,10 +51,10 @@
           <li><a href="/">Home</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li ng-show="!main.currentUser"><a href="/signup">Sign Up</a></li>
-          <li ng-show="!main.currentUser"><a href="/login">Log In</a></li>
-          <li ng-show="main.currentUser"><a href="/profile">\{{main.currentUser.displayName}}</a></li>
-          <li ng-show="main.currentUser"><a href="#" ng-click="main.logout()">Log Out</a></li>
+          <li ng-show="!main.currentUser"><a ui-sref="signup">Sign Up</a></li>
+          <li ng-show="!main.currentUser"><a ui-sref="login">Log In</a></li>
+          <li ng-show="main.currentUser"><a ui-sref="profile">\{{main.currentUser.displayName}}</a></li>
+          <li ng-show="main.currentUser"><a ng-click="main.logout()">Log Out</a></li>
         </ul>
       </div>
     </div>
@@ -62,7 +62,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-        <div ng-view></div>
+        <ui-view>
       </div>
     </div>
   </div>
