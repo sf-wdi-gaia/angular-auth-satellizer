@@ -5,9 +5,11 @@ angular
   ])
   .controller('MainController', MainController)
   .controller('HomeController', HomeController)
-  .controller('AuthController', AuthController)
+  .controller('LoginController', LoginController)
+  .controller('SignupController', SignupController)
+  .controller('LogoutController', LogoutController)
   .controller('ProfileController', ProfileController)
-  .filter('formatDate', formatDate)
+  .service('Account', Account)
   .config(configRoutes)
   ;
 
@@ -38,21 +40,59 @@ function configRoutes($stateProvider, $urlRouterProvider, $locationProvider) {
     .state('signup', {
       url: '/signup',
       templateUrl: 'templates/signup.html',
-      controller: 'AuthController',
-      controllerAs: 'auth'
+      controller: 'SignupController',
+      controllerAs: 'sc',
+      resolve: {
+        skipIfLoggedIn: skipIfLoggedIn
+      }
     })
     .state('login', {
       url: '/login',
       templateUrl: 'templates/login.html',
-      controller: 'AuthController',
-      controllerAs: 'auth'
+      controller: 'LoginController',
+      controllerAs: 'lc',
+      resolve: {
+        skipIfLoggedIn: skipIfLoggedIn
+      }
+    })
+    .state('logout', {
+      url: '/logout',
+      template: null,
+      controller: 'LogoutController',
+      resolve: {
+        loginRequired: loginRequired
+      }
     })
     .state('profile', {
       url: '/profile',
       templateUrl: 'templates/profile.html',
       controller: 'ProfileController',
-      controllerAs: 'profile'
+      controllerAs: 'profile',
+      resolve: {
+        loginRequired: loginRequired
+      }
     })
+
+
+    function skipIfLoggedIn($q, $auth) {
+      var deferred = $q.defer();
+      if ($auth.isAuthenticated()) {
+        deferred.reject();
+      } else {
+        deferred.resolve();
+      }
+      return deferred.promise;
+    }
+
+    function loginRequired($q, $location, $auth) {
+      var deferred = $q.defer();
+      if ($auth.isAuthenticated()) {
+        deferred.resolve();
+      } else {
+        $location.path('/login');
+      }
+      return deferred.promise;
+    }
 
 }
 
@@ -60,46 +100,21 @@ function configRoutes($stateProvider, $urlRouterProvider, $locationProvider) {
 // CONTROLLERS //
 /////////////////
 
-MainController.$inject = ["$auth", "$http", "$location"]; // minification protection
-function MainController ($auth, $http, $location) {
+MainController.$inject = ["Account"]; // minification protection
+function MainController (Account) {
   var vm = this;
 
-  vm.isAuthenticated = function() {
-    // send GET request to '/api/me'
-    $http.get('/api/me')
-      .then(function (response) {
-        // if response.data comes back, set vm.currentUser = response.data
-        if (response.data) {
-          vm.currentUser = response.data;
-        } else {
-          // otherwise remove token (https://github.com/sahat/satellizer#authremovetoken)
-          $auth.removeToken();
-        }
-      }, function (error) {
-        console.error(error);
-        $auth.removeToken();
-      });
-  };
+  vm.currentUser = function() {
+   return Account.currentUser();
+  }
 
-  vm.isAuthenticated();
-
-  vm.logout = function() {
-    // logout (https://github.com/sahat/satellizer#authlogout)
-    $auth.logout()
-      .then(function() {
-        // set vm.currentUser = null
-        vm.currentUser = null;
-        // redirect to '/login'
-        $location.path('/login');
-      });
-  };
 }
 
 HomeController.$inject = ["$http"]; // minification protection
 function HomeController ($http) {
   var vm = this;
   vm.posts = [];
-  vm.new_post = {};
+  vm.new_post = {}; // form data
 
   $http.get('/api/posts')
     .then(function (response) {
@@ -115,78 +130,157 @@ function HomeController ($http) {
   };
 }
 
-AuthController.$inject = ["$auth", "$location"]; // minification protection
-function AuthController ($auth, $location) {
+LoginController.$inject = ["$location", "Account"]; // minification protection
+function LoginController ($location, Account) {
   var vm = this;
-
-  // if vm.currentUser, redirect to '/profile'
-  if (vm.currentUser) {
-    $location.path('/profile');
-  }
-
-  // clear sign up / login forms
-  vm.new_user = {};
-
-  vm.signup = function() {
-    // signup (https://github.com/sahat/satellizer#authsignupuser-options)
-    $auth.signup(vm.new_user)
-      .then(function (response) {
-        // set token (https://github.com/sahat/satellizer#authsettokentoken)
-        $auth.setToken(response.data.token);
-        // call vm.isAuthenticated to set vm.currentUser
-        vm.isAuthenticated();
-        // clear sign up form
-        vm.new_user = {};
-        // redirect to '/profile'
-        $location.path('/profile');
-      }, function (error) {
-        console.error(error);
-      });
-  };
+  vm.new_user = {}; // form data
 
   vm.login = function() {
-    // login (https://github.com/sahat/satellizer#authloginuser-options)
-    $auth.login(vm.new_user)
-      .then(function (response) {
-        // set token (https://github.com/sahat/satellizer#authsettokentoken)
-        $auth.setToken(response.data.token);
-        // call vm.isAuthenticated to set vm.currentUser
-        vm.isAuthenticated();
-        // clear sign up form
-        vm.new_user = {};
-        // redirect to '/profile'
-        $location.path('/profile');
-      }, function (error) {
-        console.error(error);
+    Account
+      .login(vm.new_user)
+      .then(function(){
+        vm.new_user = {}; // clear sign up form
+        $location.path('/profile'); // redirect to '/profile'
+      })
+  };
+}
+
+SignupController.$inject = ["$location", "Account"]; // minification protection
+function SignupController ($location, Account) {
+  var vm = this;
+  vm.new_user = {}; // form data
+
+  vm.signup = function() {
+    Account
+      .signup(vm.new_user)
+      .then(
+        function (response) {
+          vm.new_user = {}; // clear sign up form
+          $location.path('/profile'); // redirect to '/profile'
+        }
+      );
+  };
+}
+
+LogoutController.$inject = ["$location", "Account"]; // minification protection
+function LogoutController ($location, Account) {
+  Account
+    .logout()
+    .then(function () {
+        $location.path('/login');
+    });
+}
+
+
+ProfileController.$inject = ["$location", "Account"]; // minification protection
+function ProfileController ($location, Account) {
+  var vm = this;
+  vm.new_profile = {}; // form data
+
+  vm.updateProfile = function() {
+    Account
+      .updateProfile(vm.new_profile)
+      .then(function () {
+        vm.showEditForm = false;
       });
   };
 }
 
-ProfileController.$inject = ["$auth", "$http", "$location"]; // minification protection
-function ProfileController ($auth, $http, $location) {
-  var vm = this;
-  // if user is not logged in, redirect to '/login'
-  if (vm.currentUser === undefined) {
-    $location.path('/login');
+//////////////
+// Services //
+//////////////
+
+Account.$inject = ["$http", "$q", "$auth"]; // minification protection
+function Account($http, $q, $auth) {
+  var self = this;
+  self.user = null;
+
+  self.signup = signup;
+  self.login = login;
+  self.logout = logout;
+  self.currentUser = currentUser;
+  self.getProfile = getProfile;
+  self.updateProfile = updateProfile;
+
+  function signup(userData) {
+    return (
+      $auth
+        .signup(userData) // signup (https://github.com/sahat/satellizer#authsignupuser-options)
+        .then(
+          function onSuccess(response) {
+            $auth.setToken(response.data.token); // set token (https://github.com/sahat/satellizer#authsettokentoken)
+          },
+
+          function onError(error) {
+            console.error(error);
+          }
+        )
+    );
   }
 
-  vm.editProfile = function() {
-    $http.put('/api/me', vm.currentUser)
-      .then(function (response) {
-        vm.showEditForm = false;
-      }, function (error) {
-        console.error(error);
-        $auth.removeToken();
-      });
-  };
-}
+  function login(userData) {
+    return (
+      $auth
+        .login(userData) // login (https://github.com/sahat/satellizer#authloginuser-options)
+        .then(
+          function onSuccess(response) {
+            $auth.setToken(response.data.token); // set token (https://github.com/sahat/satellizer#authsettokentoken)
+          },
 
-////////////////////
-// Custom Filters //
-////////////////////
+          function onError(error) {
+            console.error(error);
+          }
+        )
+    );
+  }
 
-function formatDate() {
-  return function (date) {
-    return date;
-  };
+  function logout() {
+    return (
+      $auth
+        .logout() // delete token (https://github.com/sahat/satellizer#authlogout)
+        .then(function() {
+          self.user = null;
+        })
+    );
+  }
+
+  function currentUser() {
+    if ( self.user ) { return self.user; }
+    if ( !$auth.isAuthenticated() ) { return null; }
+
+    var deferred = $q.defer();
+    getProfile().then(
+      function onSuccess(response) {
+        self.user = response.data;
+        deferred.resolve(self.user);
+      },
+
+      function onError() {
+        $auth.logout();
+        self.user = null;
+        deferred.reject();
+      }
+    )
+    self.user = promise = deferred.promise;
+    return promise;
+
+  }
+
+  function getProfile() {
+    return $http.get('/api/me');
+  }
+
+  function updateProfile(profileData) {
+    return (
+      $http
+        .put('/api/me', profileData)
+        .then(
+          function (response) {
+            self.user = response.data;
+          }
+        )
+    );
+  }
+
+
 }

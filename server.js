@@ -46,7 +46,7 @@ app.put('/api/me', auth.ensureAuthenticated, function (req, res) {
     user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
     user.save(function(err) {
-      res.status(200).end();
+      res.send(user.populate('posts'));
     });
   });
 });
