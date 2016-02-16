@@ -14,7 +14,7 @@
 
 3. In one Terminal window, run `mongod`, and in another, run `nodemon`.
 
-4. Navigate to `localhost:3000` in the browser. You should see an empty page and an angry red error message in the Chrome console.
+4. Navigate to `localhost:9000` in the browser. You should see an empty page and an angry red error message in the Chrome console.
 
 5. **BEFORE WRITING ANY CODE**, open up `models/user.js`, `resources/auth.js`, and `server.js`. The driver should go through these files in order and explain what you think each code block and/or function does.
 
