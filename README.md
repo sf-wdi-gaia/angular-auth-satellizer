@@ -1,6 +1,4 @@
-# <img src="https://cloud.githubusercontent.com/assets/7833470/10899314/63829980-8188-11e5-8cdd-4ded5bcb6e36.png" height="60"> Angular Auth Challenges
-
-Challenges for <a href="https://github.com/sf-wdi-24/modules/tree/master/week-11-front-end-frameworks-and-mobile/day-01/module-01" target="_blank">Angular Auth</a> lesson.
+# <img src="https://cloud.githubusercontent.com/assets/7833470/10899314/63829980-8188-11e5-8cdd-4ded5bcb6e36.png" height="60"> Angular Auth with Satellizer
 
 **Objective:** Implement Angular authentication with Satellizer. Your goal is to have working sign up and log in functionality.
 
@@ -40,17 +38,29 @@ Challenges for <a href="https://github.com/sf-wdi-24/modules/tree/master/week-11
 1. At this point, the "driver" should add the "navigator" as a collaborator on their forked version of the repo. No need to commit anything yet, since you haven't written any code. It's time to switch drivers! The new driver should clone their partner's forked version of the repo into their develop folder. The new navigator must close their computer.
 
 2. Now it's time to implement authentication from the client. First, you need to include Satellizer in your Angular app:
-  * Add the Satellizer CDN to `index.hbs`.
-  * Add the Satellizer module to your Angular app in `app.js`.
+  * Add the Satellizer CDN to `index.hbs` (TODO #1).
+  * Add the Satellizer module to your Angular app in `app.js` (TODO #2).
   * Check that you can navigate between your routes (`/`, `/signup`, `/login`, and `/profile`).
 
-3. Starting on line 35 of `app.js`, start following the instructions in comments to implement authentication with Satellizer. The current driver should implement `$scope.isAuthenticated` and `$scope.logout`.
+3. Follow the instructions to finish implementing `Account.login()` (TODO #3, #4, #5).
 
-4. Refresh `localhost:3000` in the browser. At this point, you should see in the Chrome developer tools that your browser is making a request to `/api/me`. Click the "Log Out" link and make sure it redirects to `/login`.
+4. Click the "Log Out" link to logout (TODO #6) and make sure it redirects to `/login` (TODO #7).
+    
+    <details><summary>Todo #6 Spoiler:</summary>
+    ```js
+    return (
+        $auth
+          .logout() // delete token https://github.com/sahat/satellizer#authlogout
+          .then(function() {
+            self.user = null;
+          })
+    )
+    ```  
+    </details>
 
 5. The current driver should add and commit their changes, and push their work up to GitHub. Switch drivers.
 
-6. The new driver should pick up where their partner left off by implementing the functionality outlined in the `AuthCtrl` and the `ProfileCtrl`.
+6. The new driver should pick up where their partner left off by implementing the functionality outlined in `Account.signup()` (TODO #8, #9, #10).
 
 7. At this point, you should be able to sign up a user, log them in, and view their profile page from the client.
 
@@ -58,23 +68,26 @@ Challenges for <a href="https://github.com/sf-wdi-24/modules/tree/master/week-11
 
 1. It's time to switch drivers again! The current driver should add, commit, and push, and the new driver should pull down the changes.
 
-2. Add a `username` field to the Sign Up form, and add the `username` attribute to `User` model (server-side). Sign up a new user with a `username`.
+2. Add a `username` field to the Sign Up form, and add the `username` attribute to `User` model (server-side). Sign up a new user with a `username` (TODO #11, #12).
 
-3. On the user profile page, make a form to edit the user's details. The form should initially be hidden, and when the user clicks a button or link to "Edit Profile", the form should show (**Hint:** `ng-show`).
+3. On the user profile page, make a form to edit the user's details. The form should initially be hidden, and when the user clicks a button or link to "Edit Profile", the form should show (**Hint:** `ng-show`) (TODO #13).
 
-4. When the user submits the form, it should call a function in the `ProfileCtrl` (**Hint:** `ng-submit`). The function should send an `$http.put` request to `/api/me`. Verify that this works.
+4. When the user submits the form, it should call a function in the `ProfileCtrl` (**Hint:** `ng-submit`). The function should send an `$http.put` request to `/api/me`. Verify that this works. (TODO #14)
 
-## Nested Resources: Posts
+5. Bonus: Decouple the edit form from the user's other details. For instance, when I type into the edit form it shouldn't instantly change my email or my username, but it should still change those values on (a successful) submit!
+
+## Nested Resources: Posts (TODO #15)
+> No more TODOs! You're on your own from here on out!
 
 1. Switch drivers - you know the drill - add, commit, and push, then the new driver should pull.
 
-2. Create a form on the homepage for the user to add a post (that's right - you're turning your Angular app into a microblog). The form should have input (`post.title`) and textarea (`post.content`) fields. Use `ng-model` to bind the form input values to `$scope`.
+2. Create a form on the homepage for the user to add a blog-post (that's right - you're turning your Angular app into a microblog). The blog-post form should have input (`title`) and textarea (`content`) fields. Hint: Use `ng-model`.
 
 3. Only show the form if there is a `currentUser` logged in.
 
-4. Use the `ng-submit` directive to run the function `createPost` when the user submits the form.
+4. Use the `ng-submit` directive to run a function called `createPost` when the user submits the form.
 
-5. `createPost` should make an `$http.post` request to `/api/posts` (which isn't defined yet on the server) with the `$scope.post` object.
+5. `createPost` should make an `$http.post` request to `/api/posts` (which isn't defined on the server yet!) with the `vm.post` object.
 
 6. The next step is to implement posts on the server. First, create a Mongoose model `Post` (`models/post.js`).
 
@@ -99,10 +112,10 @@ Challenges for <a href="https://github.com/sf-wdi-24/modules/tree/master/week-11
 
 ## Finishing Touches
 
-1. Switch drivers one last time.
+Switch drivers one last time:
 
-2. Use `ng-repeat` to display a list of all posts on the homepage. Anyone should be able to see the list of posts, but only logged in users should be able to see the form to create a new post.
+1. Validate blog-posts! Ensure a user can't submit an empty title or content. (Use both backend AND frontend validations).
 
-3. On the user's profile page, display the number of posts the user has written. **Hint:** You'll need to add `.populate('posts')` to your `GET /api/me` route in `server.js`.
+2. On the user's profile page, display the number of posts the user has written. **Hint:** You'll need to add `.populate('posts')` to your `GET /api/me` route in `server.js`.
 
-4. On the user profile page, the "Joined" date isn't formatted very nicely. Use Angular's built-in <a href="https://docs.angularjs.org/api/ng/filter/date" target="_blank">date filter</a> to display the date in this format: `January 25, 2016`.
+3. On the user profile page, the "Joined" date isn't formatted very nicely. Use Angular's built-in <a href="https://docs.angularjs.org/api/ng/filter/date" target="_blank">date filter</a> to display the date in this format: `January 25, 2016`.
