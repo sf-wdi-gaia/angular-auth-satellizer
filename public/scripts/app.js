@@ -189,11 +189,9 @@ function Account($http, $q, $auth) {
   self.updateProfile = updateProfile;
 
   function signup(userData) {
-    return (
-      // TODO #8: signup (https://github.com/sahat/satellizer#authsignupuser-options)
-      // then, set the token (https://github.com/sahat/satellizer#authsettokentoken)
-      // returns a promise
-    );
+    // TODO #8: signup (https://github.com/sahat/satellizer#authsignupuser-options)
+    // then, set the token (https://github.com/sahat/satellizer#authsettokentoken)
+    // returns a promise
   }
 
   function login(userData) {
