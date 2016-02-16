@@ -9,8 +9,7 @@ var userSchema = new Schema({
   password: { type: String, select: false },
   displayName: String,
   // TODO #12
-  picture: String,
-  posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }]
+  picture: String
 });
 
 userSchema.pre('save', function (next) {
