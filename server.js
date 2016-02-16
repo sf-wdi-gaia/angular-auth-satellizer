@@ -46,34 +46,22 @@ app.put('/api/me', auth.ensureAuthenticated, function (req, res) {
     user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
     user.save(function(err) {
-      res.send(user.populate('posts'));
+      res.send(user);
     });
   });
 });
 
 app.get('/api/posts', function (req, res) {
-  Post.find(function (err, allPosts) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json(allPosts);
-    }
-  });
-});
-
-app.post('/api/posts', auth.ensureAuthenticated, function (req, res) {
-  User.findById(req.user, function (err, user) {
-    var newPost = new Post(req.body);
-    newPost.save(function (err, savedPost) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        user.posts.push(newPost);
-        user.save();
-        res.json(savedPost);
-      }
-    });
-  });
+  res.json([
+  {
+    title: "Hardcoded Title",
+    content: "Here is some great hardcoded content for the body of a blog post. Happy coding!"
+  },
+  {
+    title: "Another Post",
+    content: "MEAN stack is the best stack."
+  }
+  ]);
 });
 
 
@@ -119,7 +107,7 @@ app.post('/auth/login', function (req, res) {
 /*
  * Catch All Route
  */
-app.get('*', function (req, res) {
+app.get(['/', '/signup', '/login', '/profile'], function (req, res) {
   res.render('index');
 });
 
