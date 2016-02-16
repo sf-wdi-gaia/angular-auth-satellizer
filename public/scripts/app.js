@@ -1,155 +1,286 @@
-var app = angular.module('authSampleApp', ['ngRoute', 'satellizer']);
+angular
+  .module('AuthSampleApp', [
+    'ui.router',
+    'satellizer'
+  ])
+  .controller('MainController', MainController)
+  .controller('HomeController', HomeController)
+  .controller('LoginController', LoginController)
+  .controller('SignupController', SignupController)
+  .controller('LogoutController', LogoutController)
+  .controller('ProfileController', ProfileController)
+  .service('Account', Account)
+  .config(configRoutes)
+  ;
 
-app.config(['$routeProvider', '$locationProvider',
-  function ($routeProvider, $locationProvider) {
-    $routeProvider
-    	.when('/', {
-    		templateUrl: 'templates/home.html',
-        controller: 'HomeCtrl'
-    	})
-    	.when('/signup', {
-    		templateUrl: 'templates/signup.html',
-        controller: 'AuthCtrl'
-    	})
-    	.when('/login', {
-    		templateUrl: 'templates/login.html',
-        controller: 'AuthCtrl'
-    	})
-      .when('/profile', {
-        templateUrl: 'templates/profile.html',
-        controller: 'ProfileCtrl'
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
 
-    $locationProvider.html5Mode({
-      enabled: true,
-      requireBase: false
-    });
+////////////
+// ROUTES //
+////////////
+
+configRoutes.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"]; // minification protection
+function configRoutes($stateProvider, $urlRouterProvider, $locationProvider) {
+
+  //this allows us to use routes without hash params!
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  });
+
+  // for any unmatched URL redirect to /
+  $urlRouterProvider.otherwise("/");
+
+  $stateProvider
+    .state('home', {
+      url: '/',
+      templateUrl: 'templates/home.html',
+      controller: 'HomeController',
+      controllerAs: 'home'
+    })
+    .state('signup', {
+      url: '/signup',
+      templateUrl: 'templates/signup.html',
+      controller: 'SignupController',
+      controllerAs: 'sc',
+      resolve: {
+        skipIfLoggedIn: skipIfLoggedIn
+      }
+    })
+    .state('login', {
+      url: '/login',
+      templateUrl: 'templates/login.html',
+      controller: 'LoginController',
+      controllerAs: 'lc',
+      resolve: {
+        skipIfLoggedIn: skipIfLoggedIn
+      }
+    })
+    .state('logout', {
+      url: '/logout',
+      template: null,
+      controller: 'LogoutController',
+      resolve: {
+        loginRequired: loginRequired
+      }
+    })
+    .state('profile', {
+      url: '/profile',
+      templateUrl: 'templates/profile.html',
+      controller: 'ProfileController',
+      controllerAs: 'profile',
+      resolve: {
+        loginRequired: loginRequired
+      }
+    })
+
+
+    function skipIfLoggedIn($q, $auth) {
+      var deferred = $q.defer();
+      if ($auth.isAuthenticated()) {
+        deferred.reject();
+      } else {
+        deferred.resolve();
+      }
+      return deferred.promise;
+    }
+
+    function loginRequired($q, $location, $auth) {
+      var deferred = $q.defer();
+      if ($auth.isAuthenticated()) {
+        deferred.resolve();
+      } else {
+        $location.path('/login');
+      }
+      return deferred.promise;
+    }
+
+}
+
+/////////////////
+// CONTROLLERS //
+/////////////////
+
+MainController.$inject = ["Account"]; // minification protection
+function MainController (Account) {
+  var vm = this;
+
+  vm.currentUser = function() {
+   return Account.currentUser();
   }
-]);
 
-app.controller('MainCtrl', ['$scope', '$auth', '$http', '$location',
-	function ($scope, $auth, $http, $location) {
-    $scope.isAuthenticated = function() {
-      // send GET request to '/api/me'
-      $http.get('/api/me')
-        .then(function (response) {
-          // if response.data comes back, set $scope.currentUser = response.data
-          if (response.data) {
-            $scope.currentUser = response.data;
-          } else {
-            // otherwise remove token (https://github.com/sahat/satellizer#authremovetoken)
-            $auth.removeToken();
-          }
-        }, function (error) {
-          console.error(error);
-          $auth.removeToken();
-        });
-    };
+}
 
-    $scope.isAuthenticated();
+HomeController.$inject = ["$http"]; // minification protection
+function HomeController ($http) {
+  var vm = this;
+  vm.posts = [];
+  vm.new_post = {}; // form data
 
-    $scope.logout = function() {
-      // logout (https://github.com/sahat/satellizer#authlogout)
-      $auth.logout()
-        .then(function() {
-          // set $scope.currentUser = null
-          $scope.currentUser = null;
-          // redirect to '/login'
-          $location.path('/login');
-        });
-    };
-  }]
-);
+  $http.get('/api/posts')
+    .then(function (response) {
+      vm.posts = response.data;
+    });
 
-app.controller('HomeCtrl', ['$scope', '$http',
-  function ($scope, $http) {
-    $scope.posts = [];
-    $scope.post = {};
-
-    $http.get('/api/posts')
+  vm.createPost = function() {
+    $http.post('/api/posts', vm.new_post)
       .then(function (response) {
-        $scope.posts = response.data;
+        vm.new_post = {};
+        vm.posts.push(response.data);
       });
-    
-    $scope.createPost = function() {
-      $http.post('/api/posts', $scope.post)
-        .then(function (response) {
-          $scope.post = {};
-          $scope.posts.push(response.data);
-        });
-    };
-  }]
-);
-
-app.controller('AuthCtrl', ['$scope', '$auth', '$location',
-  function ($scope, $auth, $location) {
-    // if $scope.currentUser, redirect to '/profile'
-    if ($scope.currentUser) {
-      $location.path('/profile');
-    }
-
-    // clear sign up / login forms
-    $scope.user = {};
-
-    $scope.signup = function() {
-      // signup (https://github.com/sahat/satellizer#authsignupuser-options)
-      $auth.signup($scope.user)
-        .then(function (response) {
-          // set token (https://github.com/sahat/satellizer#authsettokentoken)
-          $auth.setToken(response.data.token);
-          // call $scope.isAuthenticated to set $scope.currentUser
-          $scope.isAuthenticated();
-          // clear sign up form
-          $scope.user = {};
-          // redirect to '/profile'
-          $location.path('/profile');
-        }, function (error) {
-          console.error(error);
-        });
-    };
-
-    $scope.login = function() {
-      // login (https://github.com/sahat/satellizer#authloginuser-options)
-      $auth.login($scope.user)
-        .then(function (response) {
-          // set token (https://github.com/sahat/satellizer#authsettokentoken)
-          $auth.setToken(response.data.token);
-          // call $scope.isAuthenticated to set $scope.currentUser
-          $scope.isAuthenticated();
-          // clear sign up form
-          $scope.user = {};
-          // redirect to '/profile'
-          $location.path('/profile');
-        }, function (error) {
-          console.error(error);
-        });
-    };
-  }]
-);
-
-app.controller('ProfileCtrl', ['$scope', '$auth', '$http', '$location',
-	function ($scope, $auth, $http, $location) {
-    // if user is not logged in, redirect to '/login'
-    if ($scope.currentUser === undefined) {
-      $location.path('/login');
-    }
-
-    $scope.editProfile = function() {
-      $http.put('/api/me', $scope.currentUser)
-        .then(function (response) {
-          $scope.showEditForm = false;
-        }, function (error) {
-          console.error(error);
-          $auth.removeToken();
-        });
-    };
-}]);
-
-app.filter('formatDate', function() {
-  return function (date) {
-    return date;
   };
-});
+}
+
+LoginController.$inject = ["$location", "Account"]; // minification protection
+function LoginController ($location, Account) {
+  var vm = this;
+  vm.new_user = {}; // form data
+
+  vm.login = function() {
+    Account
+      .login(vm.new_user)
+      .then(function(){
+        vm.new_user = {}; // clear sign up form
+        $location.path('/profile'); // redirect to '/profile'
+      })
+  };
+}
+
+SignupController.$inject = ["$location", "Account"]; // minification protection
+function SignupController ($location, Account) {
+  var vm = this;
+  vm.new_user = {}; // form data
+
+  vm.signup = function() {
+    Account
+      .signup(vm.new_user)
+      .then(
+        function (response) {
+          vm.new_user = {}; // clear sign up form
+          $location.path('/profile'); // redirect to '/profile'
+        }
+      );
+  };
+}
+
+LogoutController.$inject = ["$location", "Account"]; // minification protection
+function LogoutController ($location, Account) {
+  Account
+    .logout()
+    .then(function () {
+        $location.path('/login');
+    });
+}
+
+
+ProfileController.$inject = ["$location", "Account"]; // minification protection
+function ProfileController ($location, Account) {
+  var vm = this;
+  vm.new_profile = {}; // form data
+
+  vm.updateProfile = function() {
+    Account
+      .updateProfile(vm.new_profile)
+      .then(function () {
+        vm.showEditForm = false;
+      });
+  };
+}
+
+//////////////
+// Services //
+//////////////
+
+Account.$inject = ["$http", "$q", "$auth"]; // minification protection
+function Account($http, $q, $auth) {
+  var self = this;
+  self.user = null;
+
+  self.signup = signup;
+  self.login = login;
+  self.logout = logout;
+  self.currentUser = currentUser;
+  self.getProfile = getProfile;
+  self.updateProfile = updateProfile;
+
+  function signup(userData) {
+    return (
+      $auth
+        .signup(userData) // signup (https://github.com/sahat/satellizer#authsignupuser-options)
+        .then(
+          function onSuccess(response) {
+            $auth.setToken(response.data.token); // set token (https://github.com/sahat/satellizer#authsettokentoken)
+          },
+
+          function onError(error) {
+            console.error(error);
+          }
+        )
+    );
+  }
+
+  function login(userData) {
+    return (
+      $auth
+        .login(userData) // login (https://github.com/sahat/satellizer#authloginuser-options)
+        .then(
+          function onSuccess(response) {
+            $auth.setToken(response.data.token); // set token (https://github.com/sahat/satellizer#authsettokentoken)
+          },
+
+          function onError(error) {
+            console.error(error);
+          }
+        )
+    );
+  }
+
+  function logout() {
+    return (
+      $auth
+        .logout() // delete token (https://github.com/sahat/satellizer#authlogout)
+        .then(function() {
+          self.user = null;
+        })
+    );
+  }
+
+  function currentUser() {
+    if ( self.user ) { return self.user; }
+    if ( !$auth.isAuthenticated() ) { return null; }
+
+    var deferred = $q.defer();
+    getProfile().then(
+      function onSuccess(response) {
+        self.user = response.data;
+        deferred.resolve(self.user);
+      },
+
+      function onError() {
+        $auth.logout();
+        self.user = null;
+        deferred.reject();
+      }
+    )
+    self.user = promise = deferred.promise;
+    return promise;
+
+  }
+
+  function getProfile() {
+    return $http.get('/api/me');
+  }
+
+  function updateProfile(profileData) {
+    return (
+      $http
+        .put('/api/me', profileData)
+        .then(
+          function (response) {
+            self.user = response.data;
+          }
+        )
+    );
+  }
+
+
+}

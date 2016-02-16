@@ -1,25 +1,25 @@
 <h2>Microblog</h2>
 <hr>
-<p ng-if="posts.length === 0">No posts yet.</p>
+<p ng-if="home.posts.length === 0">No posts yet.</p>
 
-<div ng-if="posts.length > 0">
-	<div ng-repeat="post in posts">
+<div ng-if="home.posts.length > 0">
+	<div ng-repeat="post in home.posts">
 		<p><strong>{{post.title}}</strong> - {{post.content}}</p><br>
 	</div>
 </div>
 
-<div ng-show="currentUser">
+<div ng-show="main.currentUser()">
 	<br>
 	<h4>Add New Post</h4>
 	<hr>
-	<form ng-show="currentUser" ng-submit="createPost()">
+	<form ng-show="main.currentUser()" ng-submit="home.createPost()">
 		<div class="form-group">
 			<label for="post-title">Title</label>
-		  <input type="text" ng-model="post.title" class="form-control" id="post-title" placeholder="Make sure it's creative!">
+		  <input type="text" ng-model="home.new_post.title" class="form-control" id="post-title" placeholder="Make sure it's creative!">
 		</div>
 	  <div class="form-group">
 	  	<label for="post-content">Content</label>
-	    <textarea ng-model="post.content" class="form-control" id="post-content" placeholder="Share your thoughts."></textarea>
+	    <textarea ng-model="home.new_post.content" class="form-control" id="post-content" placeholder="Share your thoughts."></textarea>
 	  </div>
 	  <input type="submit" value="Add Post" class="btn btn-block btn-info">
 	</form>

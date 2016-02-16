@@ -46,7 +46,7 @@ app.put('/api/me', auth.ensureAuthenticated, function (req, res) {
     user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
     user.save(function(err) {
-      res.status(200).end();
+      res.send(user.populate('posts'));
     });
   });
 });
@@ -127,6 +127,6 @@ app.get('*', function (req, res) {
 /*
  * Listen on localhost:3000
  */
-app.listen(3000, function() {
+app.listen(9000, function() {
   console.log('server started');
 });
