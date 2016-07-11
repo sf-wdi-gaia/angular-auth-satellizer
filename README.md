@@ -40,11 +40,14 @@
   * Check that you can navigate between your routes (`/`, `/signup`, `/login`, and `/profile`).
 
 2. Follow the instructions to finish implementing `Account.login()` (TODO #3, #4, #5).
+
+
 <details><summary>TODO #3 Hint</summary>
-```js
+``` js
 $auth.setToken(response.data.token) 
 ```
 </details>
+
 
 <details><summary>TODO #4 Hint</summary>
 ``` js
