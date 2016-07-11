@@ -201,6 +201,8 @@ function Account($http, $q, $auth) {
         .then(
           function onSuccess(response) {
             //TODO #3: set token (https://github.com/sahat/satellizer#authsettokentoken)
+
+            ;
           },
 
           function onError(error) {
