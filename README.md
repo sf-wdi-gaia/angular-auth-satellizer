@@ -41,14 +41,23 @@
 
 2. Follow the instructions to finish implementing `Account.login()` (TODO #3, #4, #5).
 <details><summary>TODO #3 Hint</summary>
-``` $auth.setToken(response.data.token) ```
+```js
+$auth.setToken(response.data.token) 
+```
 </details>
+
 <details><summary>TODO #4 Hint</summary>
-``` vm.new_user = {}```
+``` js
+vm.new_user = {}
+```
 </details>
+
 <details><summary>TODO #5 Hint</summary>
+
 inject $location into your controller
-``` $location.path('/profile') ```
+```js
+$location.path('/profile') 
+```
 </details>
 
 3. Click the "Log Out" link to logout (TODO #6) and make sure it redirects to `/login` (TODO #7).
@@ -75,9 +84,11 @@ inject $location into your controller
     </details>
 
 4. Implement the functionality outlined in `Account.signup()` (TODO #8, #9, #10).
+
 <details><summary>TODO #8 Hint</summary>
+
 inject $location into your controller
-```     
+```js     
 return (
       $auth
         .signup(userData)
@@ -91,15 +102,24 @@ return (
         })
 
       );
-      ```
+ ```
 </details>
+
 <details><summary>TODO #9 Hint</summary>
+
 inject $location into your controller
-``` vm.new_user = {} ```
+```js
+vm.new_user = {}
+```
+
 </details>
+
+
 <details><summary>TODO #10 Hint</summary>
 inject $location into your controller
-``` $location.path('/profile') ```
+```js
+$location.path('/profile') 
+```
 </details>
 
 5. At this point, you should be able to sign up a user, log them in, and view their profile page from the client.
