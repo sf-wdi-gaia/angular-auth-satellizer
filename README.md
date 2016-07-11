@@ -103,7 +103,6 @@
 
     <details><summary>TODO #8 Hint</summary>
     
-    inject $location into your controller
     ```js     
     return (
           $auth
