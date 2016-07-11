@@ -137,8 +137,8 @@ function LoginController (Account) {
   };
 }
 
-SignupController.$inject = []; // minification protection
-function SignupController () {
+SignupController.$inject = ["Account"]; // minification protection
+function SignupController (Account) {
   var vm = this;
   vm.new_user = {}; // form data
 
@@ -161,8 +161,8 @@ function LogoutController (Account) {
 }
 
 
-ProfileController.$inject = []; // minification protection
-function ProfileController () {
+ProfileController.$inject = ["Account"]; // minification protection
+function ProfileController (Account) {
   var vm = this;
   vm.new_profile = {}; // form data
 
@@ -197,7 +197,7 @@ function Account($http, $q, $auth) {
   function login(userData) {
     return (
       $auth
-        .satellizerLogin(userData) // login (https://github.com/sahat/satellizer#authloginuser-options)
+        .login(userData) // login (https://github.com/sahat/satellizer#authloginuser-options)
         .then(
           function onSuccess(response) {
             //TODO #3: set token (https://github.com/sahat/satellizer#authsettokentoken)
