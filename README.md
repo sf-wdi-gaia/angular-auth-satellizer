@@ -143,13 +143,15 @@
 ## User Settings
 
 1. Add a `username` field to the Sign Up form, and add the `username` attribute to `User` model (server-side). Sign up a new user with a `username` (TODO #11 in signup.html, #12 in user.js).
+
     <details><summary>TODO #11 Hint</summary>
-    ```
+    ```html
     <div class="form-group">
         <input type="text" ng-model="sc.new_user.username" class="form-control" placeholder="Username">
       </div>
      ```
     </details>
+ 
 2. On the user profile page, make a form to edit the user's details. The form should initially be hidden, and when the user clicks a button or link to "Edit Profile", the form should show (**Hint:** `ng-show`) (TODO #13).
 
 3. When the user submits the form, it should call a function in the `ProfileCtrl` (**Hint:** `ng-submit`). The function should send an `$http.put` request to `/api/me`. Verify that this works. (TODO #14)
