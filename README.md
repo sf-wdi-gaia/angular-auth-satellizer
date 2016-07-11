@@ -55,30 +55,30 @@
 2. Follow the instructions to finish implementing `Account.login()` (TODO #3, #4, #5).
 
 
-<details><summary>TODO #3 Hint</summary>
-``` js
-$auth.setToken(response.data.token) 
-```
-</details>
+   <details><summary>TODO #3 Hint</summary>
+   ``` js
+   $auth.setToken(response.data.token) 
+   ```
+   </details>
 
 
-<details><summary>TODO #4 Hint</summary>
-``` js
-vm.new_user = {}
-```
-</details>
+   <details><summary>TODO #4 Hint</summary>
+   ``` js
+   vm.new_user = {}
+   ```
+   </details>
 
-<details><summary>TODO #5 Hint</summary>
-
-inject $location into your controller
-```js
-$location.path('/profile') 
-```
-</details>
+   <details><summary>TODO #5 Hint</summary>
+    
+    inject $location into your controller
+    ```js
+    $location.path('/profile') 
+    ```
+    </details>
 
 3. Click the "Log Out" link to logout (TODO #6) and make sure it redirects to `/login` (TODO #7).
 
-    <details><summary>Todo #6 Spoiler:</summary>
+    <details><summary>TODO #6 Hint:</summary>
     ```js
     return (
         $auth
@@ -91,7 +91,7 @@ $location.path('/profile')
     ```  
     </details>
 
-    <details><summary>Todo #7 Spoiler:</summary>
+    <details><summary>TODO #7 Hint:</summary>
     add $location into this controller also
 
     ```js
@@ -101,55 +101,55 @@ $location.path('/profile')
 
 4. Implement the functionality outlined in `Account.signup()` (TODO #8, #9, #10).
 
-<details><summary>TODO #8 Hint</summary>
+    <details><summary>TODO #8 Hint</summary>
+    
+    inject $location into your controller
+    ```js     
+    return (
+          $auth
+            .signup(userData)
+            .then(function(response) {
+            // Redirect user here to login page or perhaps some other intermediate page
+            // that requires email address verification before any other part of the site can be accessed.
+              $auth.setToken(response.data.token);
+            })
+          .catch(function(response) {
+            console.log("handling errors?", response);
+            })
+    
+          );
+     ```
+    </details>
 
-inject $location into your controller
-```js     
-return (
-      $auth
-        .signup(userData)
-        .then(function(response) {
-        // Redirect user here to login page or perhaps some other intermediate page
-        // that requires email address verification before any other part of the site can be accessed.
-          $auth.setToken(response.data.token);
-        })
-      .catch(function(response) {
-        console.log("handling errors?", response);
-        })
-
-      );
- ```
-</details>
-
-<details><summary>TODO #9 Hint</summary>
-
-inject $location into your controller
-```js
-vm.new_user = {}
-```
-
-</details>
+    <details><summary>TODO #9 Hint</summary>
+    
+    inject $location into your controller
+    ```js
+    vm.new_user = {}
+    ```
+    
+    </details>
 
 
-<details><summary>TODO #10 Hint</summary>
-inject $location into your controller
-```js
-$location.path('/profile') 
-```
-</details>
+    <details><summary>TODO #10 Hint</summary>
+    inject $location into your controller
+    ```js
+    $location.path('/profile') 
+    ```
+    </details>
 
 5. At this point, you should be able to sign up a user, log them in, and view their profile page from the client.
 
 ## User Settings
 
 1. Add a `username` field to the Sign Up form, and add the `username` attribute to `User` model (server-side). Sign up a new user with a `username` (TODO #11 in signup.html, #12 in user.js).
-<details><summary>TODO #11 Hint</summary>
-```
-<div class="form-group">
-    <input type="text" ng-model="sc.new_user.username" class="form-control" placeholder="Username">
-  </div>
- ```
-</details>
+    <details><summary>TODO #11 Hint</summary>
+    ```
+    <div class="form-group">
+        <input type="text" ng-model="sc.new_user.username" class="form-control" placeholder="Username">
+      </div>
+     ```
+    </details>
 2. On the user profile page, make a form to edit the user's details. The form should initially be hidden, and when the user clicks a button or link to "Edit Profile", the form should show (**Hint:** `ng-show`) (TODO #13).
 
 3. When the user submits the form, it should call a function in the `ProfileCtrl` (**Hint:** `ng-submit`). The function should send an `$http.put` request to `/api/me`. Verify that this works. (TODO #14)
