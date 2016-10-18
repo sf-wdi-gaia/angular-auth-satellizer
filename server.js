@@ -31,6 +31,10 @@ var Post = require('./models/post');
  * API Routes
  */
 
+
+ /*
+  * User Profiles
+  */
 app.get('/api/me', auth.ensureAuthenticated, function (req, res) {
   User.findById(req.user, function (err, user) {
     res.send(user.populate('posts'));
@@ -50,6 +54,10 @@ app.put('/api/me', auth.ensureAuthenticated, function (req, res) {
     });
   });
 });
+
+/*
+ * User Posts
+ */
 
 app.get('/api/posts', function (req, res) {
   Post.find(function (err, allPosts) {
@@ -125,7 +133,7 @@ app.get('*', function (req, res) {
 
 
 /*
- * Listen on localhost:3000
+ * Listen on localhost:9000
  */
 app.listen(9000, function() {
   console.log('server started');
